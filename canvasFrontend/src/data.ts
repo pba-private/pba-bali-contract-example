@@ -1,13 +1,38 @@
-import type { PolkadotSigner } from "polkadot-api";
-import { Observable, of } from "rxjs";
-import { UNIT } from "./lib/currency";
+import { contracts } from "@polkadot-api/descriptors";
+import { createReviveSdk } from "@polkadot-api/sdk-ink";
+import {
+  FixedSizeBinary,
+  type PolkadotSigner,
+  type SS58String,
+} from "polkadot-api";
+import {
+  exhaustMap,
+  lastValueFrom,
+  map,
+  Observable,
+  takeWhile,
+  tap,
+} from "rxjs";
+import { client, typedApi } from "./chain";
+
+const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+const ADDRESS = "0xB6c3735CAA5942736bc2E44Bc0257a48Ab3F866c";
+const reviveSdk = createReviveSdk(typedApi, contracts.canvas_auction, {
+  atBest: true,
+});
+const contract = reviveSdk.getContract(ADDRESS);
+
+const colorToHex = (value: number) => value.toString(16).padStart(2, "0");
+const rgbToColor = (r: number, g: number, b: number) =>
+  "#" + [r, g, b].map(colorToHex).join("");
+
+export const CANVAS_SIZE = 20;
 
 export function getCanvasValue(): Observable<bigint> {
-  return of(UNIT * 42n);
-}
-
-export function getCanvasDimensions(): Observable<[number, number]> {
-  return of([20, 20]);
+  return typedApi.query.System.Account.watchValue(
+    contract.accountId,
+    "best"
+  ).pipe(map((v) => v.data.free));
 }
 
 // `${x},${y}` => tile
@@ -20,16 +45,32 @@ export function getCanvasTiles(): Observable<
     }
   >
 > {
-  return of({
-    "0,0": {
-      color: "rgb(128,32,0)",
-      price: UNIT * 10n,
-    },
-    "1,1": {
-      color: "rgb(0,64,128)",
-      price: UNIT * 32n,
-    },
-  });
+  return client.bestBlocks$.pipe(
+    exhaustMap(() =>
+      contract.query("get_tiles", {
+        origin: ALICE,
+      })
+    ),
+    map((tiles) => {
+      if (!tiles.success) {
+        console.error(tiles.value);
+        return {};
+      }
+      return Object.fromEntries(
+        tiles.value.response.map(([coordinates, color, price]) => {
+          const [x, y] = coordinates.asBytes();
+          const [r, g, b] = color.asBytes();
+          return [
+            `${x},${y}`,
+            {
+              color: rgbToColor(r, g, b),
+              price,
+            },
+          ];
+        })
+      );
+    })
+  );
 }
 
 export async function submitBid(
@@ -37,7 +78,22 @@ export async function submitBid(
   y: number,
   color: { r: number; g: number; b: number },
   price: bigint,
+  origin: SS58String,
   signer: PolkadotSigner
 ) {
-  // TODO
+  const tx = contract.send("bid", {
+    origin,
+    data: {
+      coordinate: FixedSizeBinary.fromArray([x, y]),
+      color: FixedSizeBinary.fromArray([color.r, color.g, color.b]),
+    },
+    value: price,
+  });
+
+  await lastValueFrom(
+    tx.signSubmitAndWatch(signer).pipe(
+      tap((v) => console.log(v)),
+      takeWhile((evt) => evt.type !== "txBestBlocksState" || !evt.found)
+    )
+  );
 }

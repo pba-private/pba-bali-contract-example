@@ -2,6 +2,7 @@
 
 #[ink::contract]
 mod canvas_auction {
+    use ink::prelude::vec::Vec;
     use ink::{storage::Mapping, U256};
 
     const CANVAS_SIZE: u8 = 20;
@@ -31,25 +32,40 @@ mod canvas_auction {
             }
         }
 
-        #[ink(message)]
+        #[ink(message, payable)]
         pub fn bid(&mut self, coordinate: Coordinate, color: Color) {
             let (x, y) = coordinate;
 
             assert!(x < CANVAS_SIZE, "x must be lower than CANVAS_SIZE");
             assert!(y < CANVAS_SIZE, "y must be lower than CANVAS_SIZE");
 
-            let price = self.env().transferred_value().as_u128();
+            let price = Self::u256_to_balance(self.env().transferred_value());
             if let Some((_, prev_price, prev_owner)) = self.tiles.get((x, y)) {
                 assert!(price > prev_price + MIN_BID, "Bid not big enough");
 
                 // Return previous bid to previous owner;
                 self.env()
-                    .transfer(prev_owner, U256::from(prev_price))
+                    .transfer(prev_owner, U256::from(prev_price) * U256::from(100_000_000))
                     .expect("Could not transfer funds to the previous owner");
             }
 
             self.tiles
                 .insert((x, y), &(color, price, self.env().caller()));
+        }
+
+        #[ink(message)]
+        pub fn get_tiles(&self) -> Vec<(Coordinate, Color, Balance)> {
+            let mut result = Vec::new();
+
+            for x in 0..CANVAS_SIZE {
+                for y in 0..CANVAS_SIZE {
+                    if let Some((color, price, _)) = self.tiles.get((x, y)) {
+                        result.push(((x, y), color, price));
+                    }
+                }
+            }
+
+            result
         }
 
         #[ink(message)]
@@ -60,6 +76,10 @@ mod canvas_auction {
             );
 
             self.env().terminate_contract(self.owner);
+        }
+
+        fn u256_to_balance(value: U256) -> Balance {
+            (value / U256::from(100_000_000)).as_u128()
         }
     }
 }

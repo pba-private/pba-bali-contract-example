@@ -116,6 +116,7 @@ export const SubmitColoring: FC<{
                   y,
                   { r, g, b },
                   price,
+                  account.address,
                   account.polkadotSigner
                 );
                 onClose();
