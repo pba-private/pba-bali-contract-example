@@ -1,0 +1,27 @@
+import { Observable, of } from "rxjs";
+
+export function getCanvasDimensions(): Observable<[number, number]> {
+  return of([50, 50]);
+}
+
+// `${x},${y}` => tile
+export function getCanvasTiles(): Observable<
+  Record<
+    string,
+    {
+      color: string;
+      price: bigint;
+    }
+  >
+> {
+  return of({
+    "0,0": {
+      color: "rgb(128,32,0)",
+      price: 1000n,
+    },
+    "1,1": {
+      color: "rgb(0,64,128)",
+      price: 1000n,
+    },
+  });
+}
