@@ -1,5 +1,10 @@
 import type { PolkadotSigner } from "polkadot-api";
 import { Observable, of } from "rxjs";
+import { UNIT } from "./lib/currency";
+
+export function getCanvasValue(): Observable<bigint> {
+  return of(UNIT * 42n);
+}
 
 export function getCanvasDimensions(): Observable<[number, number]> {
   return of([20, 20]);
@@ -18,11 +23,11 @@ export function getCanvasTiles(): Observable<
   return of({
     "0,0": {
       color: "rgb(128,32,0)",
-      price: 1000n,
+      price: UNIT * 10n,
     },
     "1,1": {
       color: "rgb(0,64,128)",
-      price: 1000n,
+      price: UNIT * 32n,
     },
   });
 }

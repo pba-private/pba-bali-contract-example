@@ -1,9 +1,10 @@
 import { state, useStateObservable } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
-import { combineLatest, map, of, scan, startWith, switchMap } from "rxjs";
-import { getCanvasDimensions, getCanvasTiles } from "./data";
-import { SubmitColoring } from "./SubmitColoring";
 import { useState } from "react";
+import { combineLatest, map, of, scan, startWith, switchMap } from "rxjs";
+import { getCanvasDimensions, getCanvasTiles, getCanvasValue } from "./data";
+import { formatCurrency } from "./lib/currency";
+import { SubmitColoring } from "./SubmitColoring";
 
 const dimensions$ = state(getCanvasDimensions());
 
@@ -57,6 +58,8 @@ const hoveredTile$ = state(
   null
 );
 
+const totalValue$ = state(getCanvasValue());
+
 function App() {
   const grid = useStateObservable(grid$);
   const hovered = useStateObservable(hoveredTile$);
@@ -65,44 +68,53 @@ function App() {
     y: number;
     price: bigint;
   } | null>(null);
+  const totalValue = useStateObservable(totalValue$);
 
   return (
-    <div className="">
-      {grid.map((row, y) => (
-        <div key={y} className="flex items-stretch">
-          {row.map((tile, x) => (
-            <button
-              key={x}
-              style={{ backgroundColor: tile.color }}
-              onMouseEnter={() =>
-                onHoverChange({
-                  x,
-                  y,
-                  hover: true,
-                })
-              }
-              onMouseLeave={() =>
-                onHoverChange({
-                  x,
-                  y,
-                  hover: false,
-                })
-              }
-              onClick={() =>
-                setSelectedTile({
-                  x,
-                  y,
-                  price: tile.price,
-                })
-              }
-              className="border w-6 h-6 border-slate-500"
-            ></button>
-          ))}
-        </div>
-      ))}
+    <div className="space-y-4">
+      <h1 className="text-center font-bold text-2xl">Canvas Auction</h1>
+      <div className="text-center">
+        Total Value: {formatCurrency(totalValue)}
+      </div>
+      <div>
+        {grid.map((row, y) => (
+          <div key={y} className="flex items-stretch justify-center">
+            {row.map((tile, x) => (
+              <button
+                key={x}
+                style={{ backgroundColor: tile.color }}
+                onMouseEnter={() =>
+                  onHoverChange({
+                    x,
+                    y,
+                    hover: true,
+                  })
+                }
+                onMouseLeave={() =>
+                  onHoverChange({
+                    x,
+                    y,
+                    hover: false,
+                  })
+                }
+                onClick={() =>
+                  setSelectedTile({
+                    x,
+                    y,
+                    price: tile.price,
+                  })
+                }
+                className="border w-6 h-6 border-slate-500"
+              ></button>
+            ))}
+          </div>
+        ))}
+      </div>
       {hovered ? (
         <div>
-          <h3>Price: {hovered.price}</h3>
+          <h3 className="text-center">
+            Price: {formatCurrency(hovered.price)}
+          </h3>
         </div>
       ) : null}
       {selectedTile ? (

@@ -24,8 +24,8 @@ import {
   SelectValue,
 } from "./components/ui/select";
 import { Slider } from "./components/ui/slider";
-
-const MIN_BID = 10000000000n;
+import { submitBid } from "./data";
+import { MIN_BID, UNIT, formatCurrency } from "./lib/currency";
 
 export const SubmitColoring: FC<{
   x: number;
@@ -35,9 +35,10 @@ export const SubmitColoring: FC<{
 }> = ({ x, y, currentPrice, onClose }) => {
   const [account, setAccount] = useState<InjectedPolkadotAccount | null>(null);
   const [balance, setBalance] = useState<bigint | null>(null);
-  const [color, setColor] = useState("");
+  const [color, setColor] = useState("#000000");
   const minPrice = currentPrice + MIN_BID;
   const [price, setPrice] = useState(minPrice);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setBalance(null);
@@ -46,8 +47,12 @@ export const SubmitColoring: FC<{
     }
 
     let cancelled = false;
-    typedApi.query.System.Account.getValue(account.address).then(
-      (account) => !cancelled && setBalance(account.data.free)
+    Promise.all([
+      typedApi.query.System.Account.getValue(account.address),
+      typedApi.constants.Balances.ExistentialDeposit(),
+    ]).then(
+      // Save some to pay for fees
+      ([account, ed]) => !cancelled && setBalance(account.data.free - ed - UNIT)
     );
 
     return () => {
@@ -78,8 +83,8 @@ export const SubmitColoring: FC<{
           {balance ? (
             balance < minPrice ? (
               <div>
-                Not enough funds to buy this (balance: {balance}, min price:{" "}
-                {minPrice})
+                Not enough funds to buy this (balance: {formatCurrency(balance)}
+                , min price: {formatCurrency(minPrice)})
               </div>
             ) : (
               <label className="flex items-center gap-2 tabular-nums">
@@ -87,24 +92,40 @@ export const SubmitColoring: FC<{
                 <Slider
                   value={[Number(price)]}
                   min={Number(minPrice)}
-                  max={Number(balance ?? minPrice)}
+                  max={Number(balance)}
                   onValueChange={([value]) =>
                     setPrice(BigInt(Math.round(value)))
                   }
                 />
-                {price}
+                {formatCurrency(price)}
               </label>
             )
           ) : null}
           <Button
             type="button"
-            onClick={() => {
+            onClick={async () => {
               if (!account) return;
-              console.log(color);
-              // submitBid(x, y, { r, g, b }, price, account.polkadotSigner);
-              // onClose();
+              const r = parseInt(color.slice(1, 3), 16);
+              const g = parseInt(color.slice(3, 5), 16);
+              const b = parseInt(color.slice(5, 7), 16);
+
+              try {
+                setIsSubmitting(true);
+                await submitBid(
+                  x,
+                  y,
+                  { r, g, b },
+                  price,
+                  account.polkadotSigner
+                );
+                onClose();
+              } catch (ex) {
+                console.error(ex);
+              } finally {
+                setIsSubmitting(false);
+              }
             }}
-            disabled={!balance}
+            disabled={!balance || isSubmitting}
           >
             Submit
           </Button>
