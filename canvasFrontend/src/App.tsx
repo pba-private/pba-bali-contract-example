@@ -2,6 +2,8 @@ import { state, useStateObservable } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
 import { combineLatest, map, of, scan, startWith, switchMap } from "rxjs";
 import { getCanvasDimensions, getCanvasTiles } from "./data";
+import { SubmitColoring } from "./SubmitColoring";
+import { useState } from "react";
 
 const dimensions$ = state(getCanvasDimensions());
 
@@ -9,7 +11,7 @@ const tiles$ = state(getCanvasTiles());
 
 const DEFAULT_TILE = {
   color: "rgb(255,255,255)",
-  price: 0,
+  price: 0n,
 };
 
 const grid$ = state(
@@ -58,6 +60,11 @@ const hoveredTile$ = state(
 function App() {
   const grid = useStateObservable(grid$);
   const hovered = useStateObservable(hoveredTile$);
+  const [selectedTile, setSelectedTile] = useState<{
+    x: number;
+    y: number;
+    price: bigint;
+  } | null>(null);
 
   return (
     <div className="">
@@ -81,6 +88,13 @@ function App() {
                   hover: false,
                 })
               }
+              onClick={() =>
+                setSelectedTile({
+                  x,
+                  y,
+                  price: tile.price,
+                })
+              }
               className="border w-6 h-6 border-slate-500"
             ></button>
           ))}
@@ -90,6 +104,14 @@ function App() {
         <div>
           <h3>Price: {hovered.price}</h3>
         </div>
+      ) : null}
+      {selectedTile ? (
+        <SubmitColoring
+          x={selectedTile.x}
+          y={selectedTile.y}
+          currentPrice={selectedTile.price}
+          onClose={() => setSelectedTile(null)}
+        />
       ) : null}
     </div>
   );

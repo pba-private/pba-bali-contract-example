@@ -1,3 +1,4 @@
+import type { PolkadotSigner } from "polkadot-api";
 import { Observable, of } from "rxjs";
 
 export function getCanvasDimensions(): Observable<[number, number]> {
@@ -24,4 +25,14 @@ export function getCanvasTiles(): Observable<
       price: 1000n,
     },
   });
+}
+
+export async function submitBid(
+  x: number,
+  y: number,
+  color: { r: number; g: number; b: number },
+  price: bigint,
+  signer: PolkadotSigner
+) {
+  // TODO
 }
