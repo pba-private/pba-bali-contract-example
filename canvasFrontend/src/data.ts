@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs";
 
 export function getCanvasDimensions(): Observable<[number, number]> {
-  return of([50, 50]);
+  return of([20, 20]);
 }
 
 // `${x},${y}` => tile
