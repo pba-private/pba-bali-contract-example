@@ -2,6 +2,18 @@
 
 #[ink::contract]
 mod canvas_auction {
+    // use ink::prelude::vec::Vec;
+    // use ink::{storage::Mapping, U256};
+
+    const CANVAS_SIZE: u8 = 20;
+    const MIN_BID: Balance = 10_000_000_000;
+
+    // #[cfg_attr(feature = "std", derive(ink::storage::traits::StorageLayout))]
+    // #[ink::scale_derive(Encode, Decode, TypeInfo)]
+    type Coordinate = (u8, u8);
+    type Color = (u8, u8, u8);
+
+    use ink::U256;
 
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
@@ -32,73 +44,12 @@ mod canvas_auction {
         pub fn get(&self) -> bool {
             self.value
         }
-    }
 
-    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
-    /// module and test functions are marked with a `#[test]` attribute.
-    /// The below code is technically just normal Rust code.
-    #[cfg(test)]
-    mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
-        use super::*;
-
-        /// We test a simple use case of our contract.
-        #[ink::test]
-        fn it_works() {
-            let mut canvas_auction = CanvasAuction::new(false);
-            assert_eq!(canvas_auction.get(), false);
-            canvas_auction.flip();
-            assert_eq!(canvas_auction.get(), true);
+        fn u256_to_balance(value: U256) -> Balance {
+            (value / U256::from(100_000_000)).as_u128()
         }
-    }
-
-
-    /// This is how you'd write end-to-end (E2E) or integration tests for ink! contracts.
-    ///
-    /// When running these you need to make sure that you:
-    /// - Compile the tests with the `e2e-tests` feature flag enabled (`--features e2e-tests`)
-    /// - Are running a Substrate node which contains `pallet-contracts` in the background
-    #[cfg(all(test, feature = "e2e-tests"))]
-    mod e2e_tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
-        use super::*;
-
-        /// A helper function used for calling contract messages.
-        use ink_e2e::ContractsBackend;
-
-        /// The End-to-End test `Result` type.
-        type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-
-        /// We test that we can read and write a value from the on-chain contract.
-        #[ink_e2e::test]
-        async fn it_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
-            // Given
-            let mut constructor = CanvasAuctionRef::new(false);
-            let contract = client
-                .instantiate("canvas_auction", &ink_e2e::bob(), &mut constructor)
-                .submit()
-                .await
-                .expect("instantiate failed");
-            let mut call_builder = contract.call_builder::<CanvasAuction>();
-
-            let get = call_builder.get();
-            let get_result = client.call(&ink_e2e::bob(), &get).dry_run().await?;
-            assert!(matches!(get_result.return_value(), false));
-
-            // When
-            let flip = call_builder.flip();
-            let _flip_result = client
-                .call(&ink_e2e::bob(), &flip)
-                .submit()
-                .await
-                .expect("flip failed");
-
-            // Then
-            let get = call_builder.get();
-            let get_result = client.call(&ink_e2e::bob(), &get).dry_run().await?;
-            assert!(matches!(get_result.return_value(), true));
-
-            Ok(())
+        fn balance_to_u256(value: Balance) -> U256 {
+            U256::from(value) * U256::from(100_000_000)
         }
     }
 }

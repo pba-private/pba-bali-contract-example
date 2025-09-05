@@ -1,13 +1,12 @@
-import type { PolkadotSigner } from "polkadot-api";
+import type { PolkadotSigner, SS58String } from "polkadot-api";
 import { Observable, of } from "rxjs";
 import { UNIT } from "./lib/currency";
 
+// const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+export const CANVAS_SIZE = 20;
+
 export function getCanvasValue(): Observable<bigint> {
   return of(UNIT * 42n);
-}
-
-export function getCanvasDimensions(): Observable<[number, number]> {
-  return of([20, 20]);
 }
 
 // `${x},${y}` => tile
@@ -37,6 +36,7 @@ export async function submitBid(
   y: number,
   color: { r: number; g: number; b: number },
   price: bigint,
+  origin: SS58String,
   signer: PolkadotSigner
 ) {
   // TODO

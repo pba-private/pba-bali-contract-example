@@ -1,12 +1,10 @@
 import { state, useStateObservable } from "@react-rxjs/core";
 import { createSignal } from "@react-rxjs/utils";
 import { useState } from "react";
-import { combineLatest, map, of, scan, startWith, switchMap } from "rxjs";
-import { getCanvasDimensions, getCanvasTiles, getCanvasValue } from "./data";
+import { map, of, scan, startWith, switchMap } from "rxjs";
+import { CANVAS_SIZE, getCanvasTiles, getCanvasValue } from "./data";
 import { formatCurrency } from "./lib/currency";
 import { SubmitColoring } from "./SubmitColoring";
-
-const dimensions$ = state(getCanvasDimensions());
 
 const tiles$ = state(getCanvasTiles());
 
@@ -15,17 +13,15 @@ const DEFAULT_TILE = {
   price: 0n,
 };
 
-const grid$ = state(
-  combineLatest([dimensions$, tiles$]).pipe(
-    map(([[width, height], tiles]) =>
-      new Array(height)
-        .fill(0)
-        .map((_, y) =>
-          new Array(width)
-            .fill(0)
-            .map((_, x) => tiles[`${x},${y}`] ?? DEFAULT_TILE)
-        )
-    )
+const grid$ = tiles$.pipeState(
+  map((tiles) =>
+    new Array(CANVAS_SIZE)
+      .fill(0)
+      .map((_, y) =>
+        new Array(CANVAS_SIZE)
+          .fill(0)
+          .map((_, x) => tiles[`${x},${y}`] ?? DEFAULT_TILE)
+      )
   )
 );
 

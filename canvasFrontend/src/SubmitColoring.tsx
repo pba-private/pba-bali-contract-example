@@ -26,6 +26,7 @@ import {
 import { Slider } from "./components/ui/slider";
 import { submitBid } from "./data";
 import { MIN_BID, UNIT, formatCurrency } from "./lib/currency";
+import { colorToRgb } from "./lib/color";
 
 export const SubmitColoring: FC<{
   x: number;
@@ -105,17 +106,16 @@ export const SubmitColoring: FC<{
             type="button"
             onClick={async () => {
               if (!account) return;
-              const r = parseInt(color.slice(1, 3), 16);
-              const g = parseInt(color.slice(3, 5), 16);
-              const b = parseInt(color.slice(5, 7), 16);
+              const rgb = colorToRgb(color);
 
               try {
                 setIsSubmitting(true);
                 await submitBid(
                   x,
                   y,
-                  { r, g, b },
+                  rgb,
                   price,
+                  account.address,
                   account.polkadotSigner
                 );
                 onClose();
