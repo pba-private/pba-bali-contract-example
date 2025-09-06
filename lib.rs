@@ -13,36 +13,63 @@ mod canvas_auction {
     type Coordinate = (u8, u8);
     type Color = (u8, u8, u8);
 
-    use ink::U256;
+    use ink::{storage::Mapping, U256};
 
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
     /// to add new static storage fields to your contract.
     #[ink(storage)]
     pub struct CanvasAuction {
-        /// Stores a single `bool` value on the storage.
-        value: bool,
+        tiles: Mapping<Coordinate, (Color, Balance, Address)>,
+        owner: Address,
     }
 
     impl CanvasAuction {
         /// Constructor that initializes the `bool` value to the given `init_value`.
         #[ink(constructor)]
-        pub fn new(init_value: bool) -> Self {
-            Self { value: init_value }
+        pub fn new() -> Self {
+            Self {
+                tiles: Mapping::default(),
+                owner: Self::env().caller(),
+            }
         }
 
         /// A message that can be called on instantiated contracts.
         /// This one flips the value of the stored `bool` from `true`
         /// to `false` and vice versa.
-        #[ink(message)]
-        pub fn flip(&mut self) {
-            self.value = !self.value;
+        #[ink(message, payable)]
+        pub fn bid(&mut self, coordinate: Coordinate, color: Color) {
+            let price = Self::u256_to_balance(self.env().transferred_value());
+
+            assert!(coordinate.0 < CANVAS_SIZE, "x is too large");
+            assert!(coordinate.1 < CANVAS_SIZE, "y is too large");
+
+            if let Some(tile) = self.tiles.get(coordinate) {
+                let (_, prev_price, prev_owner) = tile;
+
+                assert!(
+                    price >= prev_price + MIN_BID,
+                    "Not enough transferred value"
+                );
+                self.env()
+                    .transfer(prev_owner, Self::balance_to_u256(prev_price))
+                    .expect("couldn't transfer funds")
+            } else {
+                assert!(price >= MIN_BID, "Not enough transferred value");
+            }
+
+            self.tiles
+                .insert(coordinate, &(color, price, self.env().caller()));
         }
 
-        /// Simply returns the current value of our `bool`.
         #[ink(message)]
-        pub fn get(&self) -> bool {
-            self.value
+        pub fn terminate(&mut self) {
+            assert!(
+                self.owner == self.env().caller(),
+                "Only owner can terminate"
+            );
+
+            self.env().terminate_contract(self.owner);
         }
 
         fn u256_to_balance(value: U256) -> Balance {

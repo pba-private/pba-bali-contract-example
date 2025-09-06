@@ -1,0 +1,583 @@
+{
+  "source": {
+    "hash": "0xe41ca6462e7c2a67cc73eaab66db12d38511208233ada3fe7c4f37d51157c178",
+    "language": "ink! 6.0.0-alpha.1",
+    "compiler": "rustc 1.89.0",
+    "build_info": {
+      "build_mode": "Debug",
+      "cargo_contract_version": "6.0.0-alpha.1",
+      "rust_toolchain": "stable-aarch64-apple-darwin"
+    }
+  },
+  "contract": {
+    "name": "canvas_auction",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "image": null,
+  "spec": {
+    "constructors": [
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          "Constructor that initializes the `bool` value to the given `init_value`."
+        ],
+        "label": "new",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 13
+        },
+        "selector": "0x9bae9d5e"
+      }
+    ],
+    "docs": [],
+    "environment": {
+      "accountId": {
+        "displayName": [
+          "AccountId"
+        ],
+        "type": 15
+      },
+      "balance": {
+        "displayName": [
+          "Balance"
+        ],
+        "type": 1
+      },
+      "blockNumber": {
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 19
+      },
+      "chainExtension": {
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 20
+      },
+      "hash": {
+        "displayName": [
+          "Hash"
+        ],
+        "type": 17
+      },
+      "maxEventTopics": 4,
+      "nativeToEthRatio": 100000000,
+      "staticBufferSize": 16384,
+      "timestamp": {
+        "displayName": [
+          "Timestamp"
+        ],
+        "type": 18
+      }
+    },
+    "events": [],
+    "lang_error": {
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
+      "type": 14
+    },
+    "messages": [
+      {
+        "args": [
+          {
+            "label": "coordinate",
+            "type": {
+              "displayName": [
+                "Coordinate"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "color",
+            "type": {
+              "displayName": [
+                "Color"
+              ],
+              "type": 7
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " A message that can be called on instantiated contracts.",
+          " This one flips the value of the stored `bool` from `true`",
+          " to `false` and vice versa."
+        ],
+        "label": "bid",
+        "mutates": true,
+        "payable": true,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 13
+        },
+        "selector": "0x668d28a7"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "terminate",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 13
+        },
+        "selector": "0x476d839f"
+      }
+    ]
+  },
+  "storage": {
+    "root": {
+      "layout": {
+        "struct": {
+          "fields": [
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "struct": {
+                              "fields": [
+                                {
+                                  "layout": {
+                                    "leaf": {
+                                      "key": "0x0eaad05e",
+                                      "ty": 0
+                                    }
+                                  },
+                                  "name": "0"
+                                },
+                                {
+                                  "layout": {
+                                    "leaf": {
+                                      "key": "0x0eaad05e",
+                                      "ty": 0
+                                    }
+                                  },
+                                  "name": "1"
+                                },
+                                {
+                                  "layout": {
+                                    "leaf": {
+                                      "key": "0x0eaad05e",
+                                      "ty": 0
+                                    }
+                                  },
+                                  "name": "2"
+                                }
+                              ],
+                              "name": "(A, B, C)"
+                            }
+                          },
+                          "name": "0"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x0eaad05e",
+                              "ty": 1
+                            }
+                          },
+                          "name": "1"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x0eaad05e",
+                              "ty": 2
+                            }
+                          },
+                          "name": "2"
+                        }
+                      ],
+                      "name": "(A, B, C)"
+                    }
+                  },
+                  "root_key": "0x0eaad05e",
+                  "ty": 4
+                }
+              },
+              "name": "tiles"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 2
+                }
+              },
+              "name": "owner"
+            }
+          ],
+          "name": "CanvasAuction"
+        }
+      },
+      "root_key": "0x00000000",
+      "ty": 12
+    }
+  },
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 3,
+                "typeName": "[u8; 20]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "primitive_types",
+          "H160"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "array": {
+            "len": 20,
+            "type": 0
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "composite": {}
+        },
+        "params": [
+          {
+            "name": "K",
+            "type": 5
+          },
+          {
+            "name": "V",
+            "type": 6
+          },
+          {
+            "name": "KeyType",
+            "type": 8
+          }
+        ],
+        "path": [
+          "ink_storage",
+          "lazy",
+          "mapping",
+          "Mapping"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "tuple": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "tuple": [
+            7,
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "tuple": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "composite": {}
+        },
+        "params": [
+          {
+            "name": "L",
+            "type": 9
+          },
+          {
+            "name": "R",
+            "type": 10
+          }
+        ],
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ResolverKey"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "def": {
+          "composite": {}
+        },
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "AutoKey"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "composite": {}
+        },
+        "params": [
+          {
+            "name": "ParentKey",
+            "type": 11
+          }
+        ],
+        "path": [
+          "ink_storage_traits",
+          "impls",
+          "ManualKey"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "tiles",
+                "type": 4,
+                "typeName": "<Mapping<Coordinate, (Color, Balance, Address)> as::ink::storage::\ntraits::AutoStorableHint<::ink::storage::traits::ManualKey<\n1590733326u32, ()>,>>::Type"
+              },
+              {
+                "name": "owner",
+                "type": 2,
+                "typeName": "<Address as::ink::storage::traits::AutoStorableHint<::ink::\nstorage::traits::ManualKey<3643595174u32, ()>,>>::Type"
+              }
+            ]
+          }
+        },
+        "path": [
+          "canvas_auction",
+          "canvas_auction",
+          "CanvasAuction"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 14
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 11
+          },
+          {
+            "name": "E",
+            "type": 14
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 1,
+                "name": "CouldNotReadInput"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 16,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 0
+          }
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 16,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {}
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "NoChainExtension"
+        ]
+      }
+    }
+  ],
+  "version": 6
+}
