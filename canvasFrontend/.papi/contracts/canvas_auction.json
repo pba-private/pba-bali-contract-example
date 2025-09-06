@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xe41ca6462e7c2a67cc73eaab66db12d38511208233ada3fe7c4f37d51157c178",
+    "hash": "0x5d3dc486e641e6e5470b26c151d12505e4c6302287e30b732ef280e490bc1f5a",
     "language": "ink! 6.0.0-alpha.1",
     "compiler": "rustc 1.89.0",
     "build_info": {
@@ -43,7 +43,7 @@
         "displayName": [
           "AccountId"
         ],
-        "type": 15
+        "type": 18
       },
       "balance": {
         "displayName": [
@@ -55,19 +55,19 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 19
+        "type": 22
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 20
+        "type": 23
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 17
+        "type": 20
       },
       "maxEventTopics": 4,
       "nativeToEthRatio": 100000000,
@@ -76,7 +76,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 18
+        "type": 21
       }
     },
     "events": [],
@@ -142,6 +142,22 @@
           "type": 13
         },
         "selector": "0x476d839f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_tiles",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x92b31000"
       }
     ]
   },
@@ -502,10 +518,74 @@
       "id": 15,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 16
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 14
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 16
+          },
+          {
+            "name": "E",
+            "type": 14
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 17
+          }
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "tuple": [
+            5,
+            7,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
-                "type": 16,
+                "type": 19,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -519,7 +599,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 19,
       "type": {
         "def": {
           "array": {
@@ -530,13 +610,13 @@
       }
     },
     {
-      "id": 17,
+      "id": 20,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
-                "type": 16,
+                "type": 19,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -550,7 +630,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 21,
       "type": {
         "def": {
           "primitive": "u64"
@@ -558,7 +638,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 22,
       "type": {
         "def": {
           "primitive": "u32"
@@ -566,7 +646,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 23,
       "type": {
         "def": {
           "variant": {}

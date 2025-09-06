@@ -2,8 +2,7 @@
 
 #[ink::contract]
 mod canvas_auction {
-    // use ink::prelude::vec::Vec;
-    // use ink::{storage::Mapping, U256};
+    use ink::prelude::vec::Vec;
 
     const CANVAS_SIZE: u8 = 20;
     const MIN_BID: Balance = 10_000_000_000;
@@ -70,6 +69,22 @@ mod canvas_auction {
             );
 
             self.env().terminate_contract(self.owner);
+        }
+
+        #[ink(message)]
+        pub fn get_tiles(&self) -> Vec<(Coordinate, Color, Balance)> {
+            let mut result = Vec::new();
+
+            for x in 0..CANVAS_SIZE {
+                for y in 0..CANVAS_SIZE {
+                    if let Some(tile) = self.tiles.get((x, y)) {
+                        let (color, price, _) = tile;
+                        result.push(((x, y), color, price));
+                    }
+                }
+            }
+
+            result
         }
 
         fn u256_to_balance(value: U256) -> Balance {
