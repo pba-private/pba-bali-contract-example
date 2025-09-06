@@ -28,6 +28,12 @@ import { submitBid } from "./data";
 import { MIN_BID, UNIT, formatCurrency } from "./lib/currency";
 import { colorToRgb } from "./lib/color";
 
+let defaultColor = localStorage.getItem("canvasAuction-color") ?? "#000000";
+const setDefaultColor = (color: string) => {
+  defaultColor = color;
+  localStorage.setItem("canvasAuction-color", color);
+};
+
 export const SubmitColoring: FC<{
   x: number;
   y: number;
@@ -35,8 +41,8 @@ export const SubmitColoring: FC<{
   onClose: () => void;
 }> = ({ x, y, currentPrice, onClose }) => {
   const [account, setAccount] = useState<InjectedPolkadotAccount | null>(null);
+  const [color, setColor] = useState(defaultColor);
   const [balance, setBalance] = useState<bigint | null>(null);
-  const [color, setColor] = useState("#000000");
   const minPrice = currentPrice + MIN_BID;
   const [price, setPrice] = useState(minPrice);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,7 +84,10 @@ export const SubmitColoring: FC<{
             <input
               type="color"
               value={color}
-              onChange={(evt) => setColor(evt.target.value)}
+              onChange={(evt) => {
+                setColor(evt.target.value);
+                setDefaultColor(evt.target.value);
+              }}
             />
           </label>
           {balance ? (
@@ -151,6 +160,7 @@ const signers$ = state(
   []
 );
 
+let defaultAccount: number | null = null;
 const SelectAccount: FC<{
   account: InjectedPolkadotAccount | null;
   setAccount: (account: InjectedPolkadotAccount) => void;
@@ -158,10 +168,24 @@ const SelectAccount: FC<{
   const signers = useStateObservable(signers$);
   const value = signers.indexOf(account!);
 
+  // Again, this is not something that should be done on a real app.
+  // It would be better to have each signer identified by a unique ID, and if you
+  // want to persist them then use that ID instead. And probably also lift it into
+  // your state management solution instead of using vanilla react's state.
+  useEffect(() => {
+    if (!account && defaultAccount != null && signers[defaultAccount]) {
+      setAccount(signers[defaultAccount]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signers, account]);
+
   return (
     <Select
       value={value === -1 ? "" : `${value}`}
-      onValueChange={(value) => setAccount(signers[Number(value)])}
+      onValueChange={(value) => {
+        defaultAccount = Number(value);
+        setAccount(signers[Number(value)]);
+      }}
     >
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select Account" />
