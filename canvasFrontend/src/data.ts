@@ -104,6 +104,6 @@ export async function submitBid(
         value: price,
       })
       .signSubmitAndWatch(signer)
-      .pipe(takeWhile((evt) => evt.type != "txBestBlocksState" || evt.found))
+      .pipe(takeWhile((evt) => evt.type != "txBestBlocksState" || !evt.found))
   );
 }
